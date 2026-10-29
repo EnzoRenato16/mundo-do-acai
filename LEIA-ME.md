@@ -15,7 +15,20 @@ Abre em http://localhost:5173
 npm run build
 ```
 
-A pasta `dist/` é o site pronto. Dá para subir em Netlify, Vercel ou Cloudflare Pages (arrastando a pasta).
+A pasta `dist/` é o site pronto.
+
+## Publicado no GitHub Pages
+
+O site está em https://enzorenato16.github.io/mundo-do-acai/ e é servido pela branch `gh-pages` do repositório https://github.com/EnzoRenato16/mundo-do-acai.
+
+Para publicar uma alteração (dentro da pasta `site`):
+
+```bash
+npm run build
+cd dist && git add -A && git commit -m "Atualiza o site" && git push origin gh-pages
+```
+
+O GitHub leva de 1 a 2 minutos para mostrar a versão nova.
 
 ## O que trocar antes de publicar
 
