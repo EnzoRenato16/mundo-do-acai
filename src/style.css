@@ -125,6 +125,15 @@ button { font: inherit; }
 .btn-dark:hover { transform: translateY(-2px); }
 .btn-outline-dark { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
 .btn-outline-dark:hover { background: rgba(42, 13, 58, 0.08); }
+/* Verde do WhatsApp, com texto escuro para dar contraste */
+.btn-zap {
+  --zap: #25d366; --zap-deep: #128c4b;
+  background: var(--zap); color: #052e16;
+  box-shadow: 0 5px 0 var(--zap-deep), 0 10px 30px rgba(37, 211, 102, 0.25);
+}
+.btn-zap:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--zap-deep), 0 16px 40px rgba(37, 211, 102, 0.35); }
+.btn-zap:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--zap-deep); }
+.btn svg { flex: none; }
 
 /* ---------- Loader ---------- */
 .loader {
@@ -167,6 +176,13 @@ button { font: inherit; }
 }
 .nav-links a:hover, .nav-links a.is-active { color: var(--texto); background: rgba(255, 255, 255, 0.08); }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-zap {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: #25d366; color: #052e16;
+  box-shadow: 0 3px 0 #128c4b;
+  transition: transform 0.25s var(--ease-spring);
+}
+.nav-zap:hover { transform: translateY(-2px) rotate(-8deg); }
 .nav-toggle { display: none; }
 
 /* ---------- Hero ---------- */
@@ -653,6 +669,44 @@ button { font: inherit; }
 .app-go svg { transition: transform 0.3s var(--ease-spring); }
 .app:hover .app-go svg { transform: translateX(6px); }
 
+/* Pedido pelo Zap: texto e botão de um lado, QR code do outro */
+.zap {
+  position: relative; overflow: hidden;
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: clamp(24px, 4vw, 56px);
+  margin-top: clamp(14px, 2vw, 24px); padding: clamp(24px, 3.4vw, 40px) clamp(24px, 4vw, 52px);
+  border-radius: 32px;
+  background: rgba(28, 11, 48, 0.72);
+  box-shadow: inset 0 0 0 2px rgba(37, 211, 102, 0.35);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.zap::before {
+  content: ''; position: absolute; inset: -40% auto -40% -10%; width: 60%;
+  background: radial-gradient(closest-side, rgba(37, 211, 102, 0.22), transparent);
+  pointer-events: none;
+}
+.zap-copy { position: relative; }
+.zap-badge {
+  display: inline-grid; place-items: center; width: 64px; height: 64px; margin-bottom: 16px;
+  border-radius: 20px; background: #25d366; color: #052e16;
+  box-shadow: 0 5px 0 #128c4b; rotate: -6deg;
+}
+.zap-copy p { margin: 10px 0 0; max-width: 42ch; color: var(--texto-2); font-size: 1.1rem; }
+.zap-ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin-top: 24px; }
+.zap-num { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; color: var(--texto); text-decoration: none; letter-spacing: 0.01em; padding: 8px 0; }
+.zap-num:hover { color: #25d366; }
+.zap-qr { position: relative; margin: 0; display: grid; justify-items: center; gap: 12px; }
+.zap-qr-code {
+  position: relative; width: clamp(170px, 18vw, 212px); padding: 10px;
+  border-radius: 24px; background: #fff; rotate: 3deg;
+  box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.6), 0 24px 50px rgba(0, 0, 0, 0.4);
+  transition: rotate 0.4s var(--ease-spring);
+}
+.zap:hover .zap-qr-code { rotate: 0deg; }
+.zap-qr-code img:first-child { width: 100%; height: auto; }
+/* a logo cabe no quadrado vazio do centro do QR */
+.zap-qr-logo { position: absolute; left: 50%; top: 50%; width: 19%; height: auto; translate: -50% -50%; }
+.zap-qr figcaption { font-weight: 700; font-size: 0.95rem; color: var(--texto-2); }
+
 .reels-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-top: clamp(72px, 10vw, 128px); }
 .link-ig { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; color: var(--anel); text-decoration: none; padding: 8px 0; }
 .link-ig:hover { text-decoration: underline; text-underline-offset: 4px; }
@@ -675,6 +729,10 @@ button { font: inherit; }
 .onde-inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
 .endereco { display: flex; gap: 14px; margin-top: 30px; font-style: normal; font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
 .endereco svg { flex: none; margin-top: 2px; }
+.contato-zap { display: inline-flex; gap: 14px; margin-top: 20px; font-size: 1.05rem; line-height: 1.35; color: var(--texto-2); text-decoration: none; }
+.contato-zap svg { flex: none; color: #25d366; margin-top: 2px; }
+.contato-zap b { font-size: 1.25rem; color: var(--texto); }
+.contato-zap:hover b { color: #25d366; }
 .onde-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 .onde-map { border-radius: 32px; overflow: hidden; aspect-ratio: 4 / 3; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1), 0 30px 60px rgba(0, 0, 0, 0.4); background: var(--noite-2); }
 .onde-map iframe { width: 100%; height: 100%; border: 0; filter: invert(0.92) hue-rotate(200deg) saturate(0.7) brightness(0.95); }
@@ -691,6 +749,8 @@ button { font: inherit; }
 .footer-row { max-width: 1240px; margin: clamp(40px, 6vw, 80px) auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; color: var(--texto-2); font-size: 0.98rem; }
 .footer-row img { width: 72px; height: auto; }
 .footer-row p { margin: 0; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.link-zap { color: #25d366; }
 
 /* ---------- Barra móvel e toast ---------- */
 .mobile-cta { display: none; }
@@ -779,6 +839,11 @@ button { font: inherit; }
   .apps { grid-template-columns: 1fr; }
   .app { grid-template-columns: auto 1fr; align-items: center; padding: 20px 22px; }
   .app-go { grid-column: 1 / -1; }
+  .zap { grid-template-columns: 1fr; text-align: center; padding: 28px 22px; }
+  .zap::before { inset: -20% -20% auto; width: auto; height: 70%; }
+  .zap-copy p { margin-left: auto; margin-right: auto; }
+  .zap-ctas { flex-direction: column; }
+  .zap-ctas .btn { width: 100%; }
   .reels { grid-template-columns: repeat(3, 72vw); overflow-x: auto; scroll-snap-type: x mandatory; margin: 24px calc(var(--gutter) * -1) 0; padding: 0 var(--gutter) 12px; scrollbar-width: none; }
   .reels::-webkit-scrollbar { display: none; }
   .reel { scroll-snap-align: center; }
@@ -787,13 +852,14 @@ button { font: inherit; }
 
   .mobile-cta {
     position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 90;
-    display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; padding: 10px;
+    display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; padding: 10px;
     border-radius: 999px; background: rgba(18, 7, 32, 0.82);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
     transform: translateY(140%); transition: transform 0.45s var(--ease-out);
   }
   .mobile-cta .btn { --bh: 48px; padding: 0 12px; font-size: 1rem; }
+  .mobile-cta .mobile-zap { width: 48px; padding: 0; }
   .mobile-cta.is-on { transform: none; }
   .footer { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
   .toast { bottom: calc(96px + env(safe-area-inset-bottom)); }

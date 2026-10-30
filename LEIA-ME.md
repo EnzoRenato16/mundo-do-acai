@@ -33,6 +33,7 @@ O GitHub leva de 1 a 2 minutos para mostrar a versão nova.
 ## O que trocar antes de publicar
 
 - **Links dos apps**: já estão com a Loja 1 e a Loja 2 (as duas no mesmo endereço) em `src/main.js`, no objeto `LOJAS`. Se algum mudar, é só trocar lá.
+- **WhatsApp**: o número (11) 94045-4529 fica em `src/main.js` (`zapLink`) e aparece escrito no `index.html`. O QR code (`public/media/qr-zap.svg`) é gerado por `scripts/qr-zap.cjs`: se o número mudar, troque lá também e rode `npm run qr`.
 - **Cardápio do "Monte o seu"**: os cremes, recheios e coberturas são exemplos. Os nomes ficam em `index.html` (seção `#monte`) e as cores em `src/cup.js` (`FLAVORS`).
 - **Endereço**: confira se o pino do mapa caiu no lugar certo.
 

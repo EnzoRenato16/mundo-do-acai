@@ -6,7 +6,11 @@ import { createCup, LEVELS, FLAVORS, ease, seg } from './cup.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// WhatsApp da loja: (11) 94045-4529, a mensagem já vai escrita
+const zapLink = (msg) => `https://wa.me/5511940454529?text=${encodeURIComponent(msg)}`
+
 const LINKS = {
+  whatsapp: zapLink('Olá! Vim pelo site e quero fazer um pedido.'),
   instagram: 'https://www.instagram.com/mundodoacaiofc.pirituba/',
   maps: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Rua Cinco, 123 - Vila Renato, São Paulo - SP'),
   mapEmbed: 'https://maps.google.com/maps?q=' + encodeURIComponent('Rua Cinco, 123 - Vila Renato, São Paulo - SP') + '&z=16&output=embed',
@@ -261,6 +265,7 @@ const form = $('[data-builder]')
 const resumo = $('[data-resumo]')
 const wrap = $('.monte-cup-wrap')
 const sizeLabel = $('[data-size-label]')
+const zapPedido = $('[data-zap-pedido]')
 const NOMES = { morango: 'morango', po: 'leite em pó', banana: 'banana', granola: 'granola', pacoca: 'paçoca', condensado: 'leite condensado' }
 const juntar = (arr) => (arr.length < 2 ? arr.join('') : `${arr.slice(0, -1).join(', ')} e ${arr.at(-1)}`)
 let pedido = ''
@@ -283,6 +288,7 @@ function updateBuilder() {
   const cob = coberturas.map((c) => NOMES[c])
   resumo.textContent = `Açaí de ${tamanho} ml com creme de ${cremeNome}, recheio de ${recheioNome}` + (cob.length ? ` e cobertura de ${juntar(cob)}.` : ', sem cobertura.')
   pedido = `Olá! Quero um ${resumo.textContent.charAt(0).toLowerCase()}${resumo.textContent.slice(1)}`
+  zapPedido.href = zapLink(pedido)
 }
 form.addEventListener('change', (e) => {
   updateBuilder()
@@ -405,7 +411,7 @@ if (!reduced) {
   })
 
   // Entradas suaves nas seções de baixo
-  $$('.monte-panel > *, .psiu, #pedir-title, .pedir .lead, .app, .reels-head, .reel, .onde-copy > *, .onde-map, .footer-big').forEach((el) => {
+  $$('.monte-panel > *, .psiu, #pedir-title, .pedir .lead, .app, .zap, .reels-head, .reel, .onde-copy > *, .onde-map, .footer-big').forEach((el) => {
     gsap.from(el, { y: 36, opacity: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
   })
 }
