@@ -119,11 +119,11 @@ ScrollTrigger.create({ trigger: '.hero', start: 'bottom 60%', onEnter: () => mob
 ScrollTrigger.create({ trigger: '#pedir', start: 'top 80%', end: 'bottom 20%', onToggle: (s) => mobileCta.classList.toggle('is-on', !s.isActive && window.scrollY > window.innerHeight * 0.6) })
 
 // ---------- Shaders (WebGPU) ----------
-// a biblioteca é grande, então carrega à parte e não segura o resto da página
-import('./shader-bg.js').then(({ mountShader }) => {
-  mountShader($('[data-shader="hero"]'), 'hero', { reducedMotion: reduced })
-  mountShader($('[data-shader="pedir"]'), 'pedir', { reducedMotion: reduced })
-})
+// Só no computador: no celular o fundo em CSS da seção de apps já basta e a página fica leve.
+// A biblioteca é grande, então carrega à parte e não segura o resto da página.
+if (!reduced && window.matchMedia('(pointer: fine) and (min-width: 861px)').matches) {
+  import('./shader-bg.js').then(({ mountShader }) => mountShader($('[data-shader="pedir"]'), 'pedir'))
+}
 
 // ---------- História: "Existe açaí. E existe… Mundo do Açaí." e o holofote acende ----------
 if (!reduced) {
@@ -343,11 +343,42 @@ function heroIntro() {
   if (reduced) return
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
   tl.from('.hero-title .line > span', { yPercent: 115, rotate: 4, duration: 1.1, stagger: 0.09 })
-    .from('.hero-logo', { scale: 0.5, rotate: -25, opacity: 0, duration: 1.4, ease: 'back.out(1.6)' }, 0.1)
-    .from('.planet-glow', { opacity: 0, scale: 0.4, duration: 1.6 }, 0.2)
+    .from('.hero-art', { scale: 0.6, opacity: 0, duration: 1.4, ease: 'back.out(1.6)' }, 0.1)
     .from('.hero .eyebrow, .hero-sub, .hero-ctas', { y: 24, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.35)
-    .from('.leaf, .berry', { scale: 0, opacity: 0, duration: 0.9, stagger: 0.06, ease: 'back.out(2)' }, 0.6)
-    .from('.nav', { y: -30, opacity: 0, duration: 0.8 }, 0.4)
+    // as frutinhas "explodem" do planeta até a órbita
+    .fromTo(orbit, { spread: 0 }, { spread: 1, duration: 1.8, ease: 'expo.out' }, 0.5)
+}
+
+// ---------- Hero: órbita ao redor do planeta ----------
+// Cada item anda numa elipse inclinada como o anel da logo. Na metade de trás
+// passa por trás do planeta (z-index menor), fica menor e mais apagado.
+const orbs = $$('[data-orb]').map((el, i) => ({ el, phase: (i / 6) * Math.PI * 2, speed: 0.32 + (i % 3) * 0.05, wobble: 0.04 + (i % 2) * 0.05 }))
+const orbit = { spread: reduced ? 1 : 0, w: 0, h: 0, running: true }
+const TILT = (-12 * Math.PI) / 180
+function measureOrbit() { orbit.w = heroArt.clientWidth; orbit.h = heroArt.clientHeight }
+function renderOrbit(time) {
+  const cx = orbit.w * 0.5, cy = orbit.h * 0.31
+  const rx = orbit.w * 0.627 * orbit.spread, ry = orbit.h * 0.167 * orbit.spread
+  for (const o of orbs) {
+    const a = o.phase + time * o.speed
+    const x0 = Math.cos(a) * rx, y0 = Math.sin(a) * ry * (1 + Math.sin(time * 1.3 + o.phase) * o.wobble)
+    const x = cx + x0 * Math.cos(TILT) - y0 * Math.sin(TILT)
+    const y = cy + x0 * Math.sin(TILT) + y0 * Math.cos(TILT)
+    const depth = Math.sin(a) // > 0: metade da frente
+    const s = 0.72 + 0.28 * (depth + 1) / 2
+    o.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${s.toFixed(3)}) rotate(${((a * 180) / Math.PI).toFixed(0)}deg)`
+    o.el.style.opacity = (0.55 + 0.45 * (depth + 1) / 2).toFixed(2)
+    const z = depth > 0 ? '3' : '1'
+    if (o.el.style.zIndex !== z) o.el.style.zIndex = z
+  }
+}
+measureOrbit()
+window.addEventListener('resize', measureOrbit)
+if (reduced) renderOrbit(0)
+else {
+  gsap.ticker.add((time) => { if (orbit.running) renderOrbit(time) })
+  // para de calcular quando o hero sai da tela
+  new IntersectionObserver(([e]) => { orbit.running = e.isIntersecting }).observe($('.hero'))
 }
 if (!reduced) {
   const rx = gsap.quickTo(heroArt, 'rotationX', { duration: 0.8, ease: 'power3.out' })

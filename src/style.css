@@ -21,7 +21,7 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --gutter: clamp(16px, 4vw, 56px);
-  --nav-h: 72px;
+  --nav-h: 88px; /* espaço reservado para a barra flutuante */
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -140,19 +140,22 @@ button { font: inherit; }
 @keyframes bob { 50% { transform: translateY(-10px) rotate(-3deg); } }
 
 /* ---------- Navegação ---------- */
+/* Barra flutuante: afastada do topo (e do entalhe do iPhone) em forma de cápsula */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  height: var(--nav-h);
+  position: fixed; z-index: 100;
+  top: max(14px, env(safe-area-inset-top)); left: max(12px, calc(var(--gutter) - 14px)); right: max(12px, calc(var(--gutter) - 14px));
+  height: 62px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 0 var(--gutter);
-  transition: background-color 0.3s, transform 0.4s var(--ease-out), box-shadow 0.3s;
+  padding: 0 9px 0 14px;
+  border-radius: 999px;
+  transition: background-color 0.3s, transform 0.45s var(--ease-out), box-shadow 0.3s;
 }
 .nav.is-solid {
   background: rgba(18, 7, 32, 0.72);
   backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 12px 30px rgba(0, 0, 0, 0.3);
 }
-.nav.is-hidden { transform: translateY(-100%); }
+.nav.is-hidden { transform: translateY(calc(-100% - 30px)); }
 .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; }
 .nav-logo img { width: 44px; height: auto; transition: transform 0.4s var(--ease-spring); }
 .nav-logo:hover img { transform: rotate(-12deg) scale(1.08); }
@@ -167,6 +170,7 @@ button { font: inherit; }
 .nav-toggle { display: none; }
 
 /* ---------- Hero ---------- */
+/* (usado só na seção de apps, no computador) */
 .shader-host { position: absolute; inset: 0; overflow: hidden; }
 .shader-host canvas { width: 100%; height: 100%; opacity: 0; transition: opacity 1.2s var(--ease-out); }
 .shader-host.shader-on canvas { opacity: 1; }
@@ -178,20 +182,56 @@ button { font: inherit; }
   overflow: hidden;
   isolation: isolate;
 }
+/* Fundo do hero: tudo em CSS e animado só com transform/opacity (leve no celular) */
 .hero-bg {
-  z-index: -1;
-  /* fundo em CSS para navegadores sem WebGPU */
+  position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  --cx: 72%; --cy: 46%;
   background:
-    radial-gradient(60% 50% at 75% 40%, rgba(160, 77, 255, 0.55), transparent 70%),
-    radial-gradient(40% 40% at 20% 80%, rgba(155, 226, 45, 0.16), transparent 70%),
-    radial-gradient(80% 70% at 50% 0%, #3a0f5a, transparent 70%),
+    radial-gradient(70% 60% at var(--cx) var(--cy), #5a1a86, transparent 70%),
+    radial-gradient(90% 80% at 50% 0%, #2e0b47, transparent 70%),
     var(--noite);
 }
 .hero-bg::after {
   content: ''; position: absolute; inset: auto 0 0; height: 30%;
   background: linear-gradient(transparent, var(--noite));
-  pointer-events: none;
 }
+/* raios girando atrás do planeta, como nas artes da marca */
+.rays {
+  position: absolute; left: var(--cx); top: var(--cy);
+  width: 170vmax; height: 170vmax; margin: -85vmax 0 0 -85vmax;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.075) 0 5deg, transparent 5deg 12deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0 8%, rgba(0, 0, 0, 0.6) 22%, transparent 48%);
+  mask-image: radial-gradient(circle, #000 0 8%, rgba(0, 0, 0, 0.6) 22%, transparent 48%);
+  animation: spin 80s linear infinite;
+  will-change: transform;
+}
+.blob {
+  position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%;
+  will-change: transform;
+}
+.blob-1 {
+  left: calc(var(--cx) - 35vmax); top: calc(var(--cy) - 35vmax);
+  background: radial-gradient(circle, rgba(176, 100, 255, 0.5), rgba(160, 77, 255, 0.12) 40%, transparent 68%);
+  animation: breathe 9s ease-in-out infinite;
+}
+.blob-2 {
+  left: -20vmax; bottom: -30vmax;
+  background: radial-gradient(circle, rgba(155, 226, 45, 0.16), transparent 62%);
+  animation: wander 16s ease-in-out infinite alternate;
+}
+@keyframes breathe { 50% { transform: scale(1.12); opacity: 0.8; } }
+@keyframes wander { to { transform: translate(18vmax, -10vmax) scale(1.15); } }
+/* brilhos de 4 pontas piscando */
+.sparkles i {
+  position: absolute; width: 14px; height: 14px;
+  background: #f3e8ff;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: twinkle 3.6s ease-in-out var(--d) infinite;
+  will-change: transform, opacity;
+}
+.sparkles i:nth-child(3n) { width: 9px; height: 9px; }
+.sparkles i:nth-child(4n) { background: var(--anel); }
+@keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); } 50% { opacity: 0.9; transform: scale(1) rotate(45deg); } }
 .hero-inner {
   width: 100%; max-width: 1320px; margin: 0 auto;
   display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: clamp(24px, 4vw, 64px);
@@ -211,30 +251,45 @@ button { font: inherit; }
 .hero-art { position: relative; justify-self: center; width: min(100%, 520px); aspect-ratio: 383 / 408; perspective: 900px; }
 .hero-logo {
   position: relative; z-index: 2; width: 100%; height: auto;
-  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.45));
   animation: float 6s ease-in-out infinite;
-  transform-style: preserve-3d;
+  will-change: transform;
 }
+/* brilho atrás do planeta: gradiente puro, sem filtro de desfoque */
 .planet-glow {
-  position: absolute; inset: 6% 10% 30%; z-index: 1; border-radius: 50%;
-  background: radial-gradient(circle, rgba(196, 140, 255, 0.75), rgba(160, 77, 255, 0.25) 45%, transparent 70%);
-  filter: blur(30px);
-  animation: pulse 5s ease-in-out infinite;
+  position: absolute; inset: -12% -8% 18%; z-index: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(206, 160, 255, 0.55), rgba(160, 77, 255, 0.2) 38%, transparent 66%);
+  animation: breathe 6s ease-in-out infinite;
+  will-change: transform, opacity;
 }
-@keyframes float { 50% { transform: translateY(-16px) rotate(1.5deg); } }
-@keyframes pulse { 50% { opacity: 0.65; transform: scale(1.08); } }
-.leaf { position: absolute; z-index: 3; width: 64px; height: auto; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.3)); }
-.leaf-1 { left: -2%; top: 58%; transform: rotate(-24deg); animation: drift 7s ease-in-out infinite; }
-.leaf-2 { right: 0; top: 8%; width: 48px; transform: rotate(32deg); animation: drift 8s ease-in-out -2s infinite reverse; }
-.berry {
-  position: absolute; z-index: 3; border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, #b98ad6 0 8%, #4a1259 42%, #1d0627 100%);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+@keyframes float { 50% { transform: translateY(-14px) rotate(1.5deg); } }
+
+/* órbita: o JS posiciona cada item numa elipse inclinada como o anel da logo */
+.orbit { position: absolute; inset: 0; pointer-events: none; }
+.orbit-path {
+  position: absolute; left: -14%; top: 14%; width: 128%; height: 34%;
+  transform: rotate(-12deg); overflow: visible;
 }
-.berry-1 { width: 34px; height: 34px; left: 8%; top: 14%; animation: drift 6s ease-in-out infinite; }
-.berry-2 { width: 22px; height: 22px; right: 6%; top: 52%; animation: drift 5s ease-in-out -1s infinite; }
-.berry-3 { width: 28px; height: 28px; right: 22%; bottom: 2%; animation: drift 7s ease-in-out -3s infinite; }
-@keyframes drift { 50% { translate: 0 -14px; rotate: 8deg; } }
+.orbit-path ellipse {
+  fill: none; stroke: rgba(233, 216, 255, 0.3); stroke-width: 1.6; stroke-dasharray: 2 8; stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.orb {
+  --z: calc(var(--s) * var(--k, 1));
+  position: absolute; left: 0; top: 0; width: var(--z); height: var(--z);
+  margin: calc(var(--z) / -2) 0 0 calc(var(--z) / -2);
+  will-change: transform, opacity;
+}
+.orb-berry {
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #d3a8ec 0 7%, #6a1f80 30%, #3a0c47 62%, #1d0627 100%);
+  box-shadow: inset -3px -4px 8px rgba(0, 0, 0, 0.45);
+}
+.orb-leaf {
+  height: calc(var(--z) * 0.5);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Cpath d='M2 15 C14 -2 46 -2 58 15 C46 32 14 32 2 15Z' fill='%237cc62a'/%3E%3Cpath d='M4 15 H56' stroke='%23d6f5a8' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat;
+  margin-top: calc(var(--z) / -4);
+}
+.orb-leaf-2 { filter: hue-rotate(-12deg) brightness(0.85); }
 
 .scroll-cue {
   position: absolute; left: 50%; bottom: 24px; translate: -50% 0;
@@ -280,15 +335,19 @@ button { font: inherit; }
     radial-gradient(80% 60% at 50% 40%, rgba(60, 20, 90, 0.5), transparent 75%);
 }
 /* o feixe: começa estreito no alto e abre até passar das bordas da tela */
-.spot { position: absolute; inset: 0; z-index: -1; filter: blur(18px); opacity: 0; transform-origin: 50% 0; pointer-events: none; will-change: opacity, transform; }
+/* feixes feitos com gradiente cônico: bordas já saem suaves, sem filtro de desfoque */
+.spot {
+  position: absolute; inset: 0; z-index: -1; opacity: 0; transform-origin: 50% 0; pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 35%, rgba(0, 0, 0, 0.5) 75%, transparent);
+  mask-image: linear-gradient(#000 35%, rgba(0, 0, 0, 0.5) 75%, transparent);
+  will-change: opacity, transform;
+}
 .spot-beam {
-  position: absolute; top: -4%; left: 50%; width: 150vw; height: 108%; translate: -50% 0;
-  clip-path: polygon(43% 0, 57% 0, 100% 100%, 0 100%);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.34), rgba(206, 170, 255, 0.15) 50%, rgba(160, 77, 255, 0.05) 85%, transparent);
+  position: absolute; inset: 0;
+  background: conic-gradient(from 140deg at 50% -6%, transparent 0deg, rgba(220, 196, 255, 0.07) 16deg, rgba(255, 255, 255, 0.22) 40deg, rgba(220, 196, 255, 0.07) 64deg, transparent 80deg);
 }
 .spot-beam-core {
-  clip-path: polygon(47% 0, 53% 0, 74% 100%, 26% 100%);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.05) 70%, transparent);
+  background: conic-gradient(from 166deg at 50% -6%, transparent 0deg, rgba(255, 255, 255, 0.2) 14deg, transparent 28deg);
 }
 /* poeirinha flutuando dentro da luz (anda com transform, sem redesenhar a tela) */
 .spot-dust {
@@ -657,7 +716,8 @@ button { font: inherit; }
 }
 
 @media (max-width: 860px) {
-  :root { --nav-h: 64px; }
+  :root { --nav-h: 80px; }
+  .nav { height: 56px; padding: 0 7px 0 12px; }
   .nav-toggle {
     display: grid; place-content: center; gap: 6px;
     width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
@@ -679,7 +739,8 @@ button { font: inherit; }
   .nav-logo span { display: none; }
 
   .hero { padding-bottom: 120px; }
-  .spot-beam { width: 260vw; }
+  .hero-bg { --cx: 50%; --cy: 27%; }
+  .orbit { --k: 0.66; }
   .copo { height: min(42svh, 420px); }
   .stage { margin-bottom: 17svh; }
   .hero-inner { grid-template-columns: 1fr; text-align: center; }
